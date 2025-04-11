@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flashcard Study Tool</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        #card-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            margin-bottom: 20px;
+            flex-direction: column; /* Stack items vertically by default */
+        }
+
+        #question {
+            font-size: 24px;
+            margin: 20px;
+        }
+
+        .answer {
+            font-size: 18px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin: 10px;
+            cursor: pointer;
+            width: 200px;
+            text-align: center;
+            user-select: none; /* Prevent text selection */
+        }
+
+        .answer:hover {
+            background-color: #f0f0f0;
+        }
+
+        #stats {
+            margin-top: 20px;
+        }
+
+        #timer {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        #input-container {
+            text-align: center;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #input-options {
+            display: flex;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        #input-options button {
+            padding: 10px 15px;
+            margin: 5px;
+            background-color: #e0e0e0;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #input-options button:hover {
+            background-color: #ccc;
+        }
+
+        #file-upload {
+            display: none;
+        }
+
+        #table-input {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+        #table-input th, #table-input td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+        #table-input th {
+            background-color: #f0f0f0;
+        }
+
+        #table-input input {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        #generate-download {
+            margin-top: 20px;
+            display: none; /* Initially hidden */
+        }
+
+        #generate-download button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #generate-download button:hover {
+            background-color: #45a049;
+        }
+
+        #instructions {
+            text-align: left;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+
+        #instructions h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        #instructions ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        #instructions p {
+            margin-bottom: 10px;
+        }
+
+        @media (min-width: 600px) {
+            #card-container {
+                flex-direction: row; /* Arrange items in a row on wider screens */
+            }
+        }
+        .answer {
+            margin: 10px;
+            /* width will be defined, or will take up available space */
+        }
+    </style>
+</head>
+<body>
+    <div id="timer">Time: 00:00</div>
+    <div id="card-container">
+        <div class="answer" id="answer1"></div>
+        <div id="question"></div>
+        <div class="answer" id="answer2"></div>
+    </div>
+    <div id="stats">
+        Right: <span id="right-count">0</span> | Total: <span id="total-count">0</span> | Wrong: <span id="wrong-count">0</span> | Streak: <span id="streak-count">0</span>
+    </div>
+
+    <div id="input-container">
+        <div id="input-options">
+            <button id="upload-table">Upload Table</button>
+            <button id="create-table">Create New Table</button>
+        </div>
+        <input type="file" id="file-upload" accept=".csv, .xlsx, .ods" />
+        <table id="table-input">
+            <thead>
+                <tr>
+                    <th>Question</th>
+                    <th>True</th>
+                    <th>False</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" /></td>
+                    <td><input type="text" /></td>
+                    <td><input type="text" /></td>
+                </tr>
+                <tr>
+                    <td><input type="text" /></td>
+                    <td><input type="text" /></td>
+                    <td><input type="text" /></td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="generate-download">
+            <button id="download-table">Download Table</button>
+            <button id="add-row">Add Row</button> </div>
+    </div>
+
+    <div id="instructions">
+        <h2>Instructions for Uploading Tables</h2>
+        <p>
+            The application supports uploading flashcard data from CSV, Excel (xlsx), and OpenOffice Calc (ods) files.  The file should be formatted as follows:
+        </p>
+        <ul>
+            <li>The first row should contain the headers: "Question", "True", and "False".  These are case-sensitive and must be spelled exactly as shown.</li>
+            <li>Each subsequent row represents a flashcard.</li>
+            <li>The "Question" column contains the question for the flashcard.</li>
+            <li>The "True" and "False" columns contain the two possible answers.</li>
+            <li>Ensure that there are no empty rows or columns within your data.</li>
+        </ul>
+        <p>
+            For example, a valid CSV file might look like this:
+        </p>
+        <pre><code>
+Question,True,False
+What is 2 + 2?,4,3
+Capital of France?,Paris,Berlin
+What is H2O?,Water,Salt
+        </code></pre>
+         <p>
+            An example of how to fill the table:
+        </p>
+        <table border="1" style="margin-left: auto; margin-right: auto;">
+            <tr>
+                <th>Question</th>
+                <th>True</th>
+                <th>False</th>
+            </tr>
+            <tr>
+                <td>What is the capital of Spain?</td>
+                <td>Madrid</td>
+                <td>Barcelona</td>
+            </tr>
+            <tr>
+                <td>What is the currency of Japan?</td>
+                <td>Yen</td>
+                <td>Yuan</td>
+            </tr>
+        </table>
+    </div>
+
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script>
+        let flashcards = [];
+        let currentCardIndex = 0;
+        let rightCount = 0;
+        let totalCount = 0;
+        let wrongCount = 0;
+        let streakCount = 0;
+        let wrongCards = [];
+        let nextWrongCardIndex = 0;
+        let wrongCardIntervals = [1, 5, 10];
+        let wrongCardCounters = [0, 0, 0];
+        let startTime;
+        let timerInterval;
+        let isCorrectAnswerLeft = true; // To alternate correct answer side
+        let cardHistory = [];
+
+        const fileUpload = document.getElementById("file-upload");
+        const tableInput = document.getElementById("table-input");
+        const uploadTableButton = document.getElementById("upload-table");
+        const createTableButton = document.getElementById("create-table");
+        const downloadTableButton = document.getElementById("download-table");
+        const generateDownloadButton = document.getElementById("generate-download");
+        const addRowButton = document.getElementById("add-row"); // Get the Add Row button
+
+
+        uploadTableButton.addEventListener("click", () => {
+            fileUpload.click();
+        });
+
+        createTableButton.addEventListener("click", () => {
+            tableInput.style.display = "table";
+            generateDownloadButton.style.display = "block";
+            // Clear any existing content in the table body, before adding rows.
+            const tableBody = tableInput.querySelector("tbody");
+            tableBody.innerHTML = '';
+            addRowToTable(); // Add at least one row when table is created.
+
+        });
+
+        fileUpload.addEventListener("change", handleFile);
+        downloadTableButton.addEventListener("click", downloadTable);
+        addRowButton.addEventListener("click", addRowToTable); // Add event listener for Add Row button
+
+
+        function handleFile(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const data = e.target.result;
+                const workbook = XLSX.read(data, { type: "binary" });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                if (jsonData && jsonData.length > 0) {
+                    const headers = jsonData[0];
+                    if (headers[0] === "Question" && headers[1] === "True" && headers[2] === "False") {
+                        flashcards = jsonData.slice(1).map(row => ({
+                            question: row[0],
+                            answer1: row[1],
+                            answer2: row[2]
+                        }));
+                        if (flashcards.length > 0) {
+                            currentCardIndex = 0;
+                            rightCount = 0;
+                            totalCount = 0;
+                            wrongCount = 0;
+                            streakCount = 0;
+                            wrongCards = [];
+                            nextWrongCardIndex = 0;
+                            wrongCardCounters = [0, 0, 0];
+                            isCorrectAnswerLeft = true;
+                            cardHistory = [];
+                            displayCard();
+                            updateStats();
+                            startTimer();
+                            tableInput.style.display = "none";
+                            generateDownloadButton.style.display = "none";
+                        } else {
+                            alert("The uploaded file contains no flashcard data.");
+                        }
+                    } else {
+                        alert("The uploaded file is not in the correct format.  Please ensure the first row contains the headers 'Question', 'True', and 'False'.");
+                    }
+                } else {
+                    alert("The uploaded file is empty or contains no data.");
+                }
+            };
+
+            reader.onerror = () => {
+                alert("Error reading file.");
+            };
+
+            reader.readAsBinaryString(file);
+        }
+
+        function loadTableData() {
+            const rows = tableInput.rows;
+            flashcards = [];
+            for (let i = 1; i < rows.length; i++) {
+                const question = rows[i].cells[0].firstChild.value.trim();
+                const answer1 = rows[i].cells[1].firstChild.value.trim();
+                const answer2 = rows[i].cells[2].firstChild.value.trim();
+                if (question && answer1 && answer2) {
+                    flashcards.push({ question, answer1, answer2 });
+                }
+            }
+             if (flashcards.length > 0) {
+                currentCardIndex = 0;
+                rightCount = 0;
+                totalCount = 0;
+                wrongCount = 0;
+                streakCount = 0;
+                wrongCards = [];
+                nextWrongCardIndex = 0;
+                wrongCardCounters = [0, 0, 0];
+                isCorrectAnswerLeft = true;
+                cardHistory = [];
+                displayCard();
+                updateStats();
+                startTimer();
+                tableInput.style.display = "none";
+                generateDownloadButton.style.display = "none";
+            } else {
+                 alert("Please enter flashcard data into the table.");
+            }
+        }
+
+
+
+        function downloadTable() {
+            const data = [["Question", "True", "False"]];
+            const rows = tableInput.rows;
+            for (let i = 1; i < rows.length; i++) {
+                const question = rows[i].cells[0].firstChild.value.trim();
+                const answer1 = rows[i].cells[1].firstChild.value.trim();
+                const answer2 = rows[i].cells[2].firstChild.value.trim();
+                if (question || answer1 || answer2) {
+                    data.push([question, answer1, answer2]);
+                }
+            }
+
+            const worksheet = XLSX.utils.aoa_to_sheet(data);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Flashcards");
+            XLSX.writeFile(workbook, "flashcards.xlsx");
+        }
+
+
+        function displayCard() {
+            let card;
+            if (wrongCards.length > 0 && nextWrongCardIndex < wrongCards.length) {
+                card = wrongCards[nextWrongCardIndex];
+            } else {
+                card = flashcards[currentCardIndex];
+            }
+
+            document.getElementById("question").textContent = card.question;
+            const answer1Element = document.getElementById("answer1");
+            const answer2Element = document.getElementById("answer2");
+
+            if (isCorrectAnswerLeft) {
+                answer1Element.textContent = card.answer2;
+                answer2Element.textContent = card.answer1;
+            } else {
+                answer1Element.textContent = card.answer1;
+                answer2Element.textContent = card.answer2;
+            }
+            cardHistory.push({ index: currentCardIndex, isWrong: (wrongCards.length > 0 && nextWrongCardIndex < wrongCards.length)});
+            isCorrectAnswerLeft = !isCorrectAnswerLeft; // Alternate for the next card
+        }
+
+        function checkAnswer(selectedAnswer) {
+            let card;
+            let isWrongCard = false;
+             if (wrongCards.length > 0 && nextWrongCardIndex < wrongCards.length) {
+                card = wrongCards[nextWrongCardIndex];
+                isWrongCard = true;
+            } else {
+                card = flashcards[currentCardIndex];
+            }
+            const answer1Element = document.getElementById("answer1");
+            const correctAnswer = isCorrectAnswerLeft ? card.answer2 : card.answer1;
+
+            if (selectedAnswer === correctAnswer) {
+                rightCount++;
+                streakCount++;
+                 if (isWrongCard) {
+                    wrongCards.splice(nextWrongCardIndex, 1);
+                    if (wrongCards.length === 0) {
+                        nextWrongCardIndex = 0;
+                    }
+                }
+            } else {
+                wrongCount++;
+                streakCount = 0;
+                if (!isWrongCard && wrongCards.indexOf(card) === -1) {
+                    wrongCards.push(card);
+                }
+            }
+
+            totalCount++;
+            updateStats();
+
+             if (wrongCards.length > 0 && nextWrongCardIndex < wrongCards.length) {
+                 //do nothing
+             }else{
+                currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+             }
+
+            for (let i = 0; i < wrongCardCounters.length; i++) {
+                wrongCardCounters[i]++;
+            }
+            let needReview = false;
+            for (let i = 0; i < wrongCardIntervals.length; i++) {
+                if (wrongCardCounters[i] >= wrongCardIntervals[i] && wrongCards.length > 0) {
+                    needReview = true;
+                    nextWrongCardIndex = 0;
+                    wrongCardCounters[i] = 0;
+                    break;
+                }
+            }
+            if (!needReview && wrongCards.length > 0 && nextWrongCardIndex < wrongCards.length){
+                 nextWrongCardIndex = (nextWrongCardIndex + 1) % wrongCards.length;
+            }
+            displayCard();
+        }
+
+        function updateStats() {
+            document.getElementById("right-count").textContent = rightCount;
+            document.getElementById("total-count").textContent = totalCount;
+            document.getElementById("wrong-count").textContent = wrongCount;
+            document.getElementById("streak-count").textContent = streakCount;
+        }
+
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            const elapsedTime = Date.now() - startTime;
+            const minutes = Math.floor(elapsedTime / 60000);
+            const seconds = Math.floor((elapsedTime % 60000) / 1000);
+            document.getElementById("timer").textContent = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        document.getElementById("answer1").addEventListener("click", () => {
+            const answer1Element = document.getElementById("answer1");
+            checkAnswer(answer1Element.textContent);
+        });
+        document.getElementById("answer2").addEventListener("click", () => {
+            const answer2Element = document.getElementById("answer2");
+            checkAnswer(answer2Element.textContent);
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft") {
+                const answer1Element = document.getElementById("answer1");
+                checkAnswer(answer1Element.textContent);
+            } else if (event.key === "ArrowRight") {
+                const answer2Element = document.getElementById("answer2");
+                checkAnswer(answer2Element.textContent);
+            }
+        });
+
+        // Function to add a new row to the table
+        function addRowToTable() {
+            const tableBody = tableInput.querySelector("tbody");
+            const newRow = tableBody.insertRow();
+
+            const questionCell = newRow.insertCell();
+            const trueCell = newRow.insertCell();
+            const falseCell = newRow.insertCell();
+
+            questionCell.innerHTML = '<input type="text" />';
+            trueCell.innerHTML = '<input type="text" />';
+            falseCell.innerHTML = '<input type="text" />';
+        }
+
+
+        // Initial setup:  Check if there's data in local storage
+        if (flashcards.length === 0) {
+            tableInput.style.display = "table";
+            generateDownloadButton.style.display = "block";
+            addRowToTable(); // Ensure at least one row is present when the table is first displayed.
+        } else {
+            displayCard();
+            updateStats();
+            startTimer();
+        }
+    </script>
+</body>
+</html>
