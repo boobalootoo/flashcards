@@ -1,0 +1,24 @@
+Question,TRUE,FALSE
+Describe the fetch-execute cycle,"The CPU fetches an instruction from memory, decodes it to understand the action required, and then executes it.","The CPU fetches an instruction, executes it, and then decodes it."
+List common CPU components and their function,"ALU (calculations/logic), CU (controls the CPU), Registers (temporary storage), Cache (fast memory), Buses (data transfer).","ALU (controls CPU), CU (performs calculations), Registers (permanent storage), Cache (slow memory), Buses (store data)."
+What is the function of an ALU?,It performs arithmetic and logic operations.,It stores arithmetic and logic operations.
+What is the function of a CU?,It controls the flow of data and coordinates the CPU.,It performs arithmetic and logic operations.
+What is the function of a Cache?,It stores frequently used data close to the CPU for faster access.,It stores infrequently used data close to the CPU.
+What is the function of Registers?,They store small amounts of data or instructions temporarily.,They store large amounts of data permanently.
+What is Von Neumann architecture?,A design where data and instructions are stored in the same memory.,A design where data and instructions are stored in separate memory.
+What is MAR?,Memory Address Register holds the address of the data to be accessed.,Memory Address Register holds the data to be accessed.
+What is MDR?,Memory Data Register holds the actual data being transferred.,Memory Data Register holds the address of the data.
+What is the Program Counter?,It holds the memory address of the next instruction.,It holds the current instruction.
+What is the Accumulator?,It temporarily stores the result of calculations.,It stores the address of data being calculated.
+What actions occur in each stage of the fetch-execute cycle?,"Fetch: get instruction from memory, Decode: interpret instruction, Execute: carry out instruction.","Fetch: execute instruction from memory, Decode: store instruction, Execute: interpret instruction."
+Describe the role of each CPU component during fetch-execute cycle,"CU manages process, ALU performs calculations, Registers store temporary data, Cache stores frequently used data.","CU stores data, ALU manages processes, Registers control the CPU, Cache stores infrequently used data."
+"Purpose of each register, and what it stores?","MAR: address, MDR: data, PC: next instruction address, ACC: result of calculations.","MAR: data, MDR: address, PC: current instruction, ACC: instruction address."
+Difference between storing data and address?,Data is the actual value; an address is the location in memory.,Data is the location in memory; an address is the actual value.
+Common characteristics of a CPU affecting performance,"Clock speed, cache size, number of cores.","Clock size, cache number, core speed."
+How does clock speed affect performance?,"Higher clock speed means more instructions per second, so faster performance.","Higher clock speed means more memory is used, so slower performance."
+How does cache size affect performance?,"Larger cache stores more data close to CPU, reducing fetch time.",Larger cache increases fetch time due to complexity.
+How does number of cores affect performance?,More cores allow more instructions to be processed at once.,More cores slow down instruction processing.
+"Define clock speed, cache size, number of cores","Clock speed: cycles/sec, Cache size: fast memory size, Cores: number of processors in CPU.","Clock speed: size of memory, Cache size: speed of CPU, Cores: storage capacity."
+"How do clock speed, cache size, and number of cores affect system performance?",Each can independently or together improve performance by speeding up processing and reducing wait times.,Each independently or together reduces performance by adding delay.
+Purpose and characteristics of embedded systems?,"Designed for specific tasks, built into devices, often low power and efficient.","Designed for general use, external to devices, often high power and inefficient."
+Examples of embedded systems?,"Washing machine controller, microwave, traffic light controller.","Laptop, smartphone, desktop PC."
