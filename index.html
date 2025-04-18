@@ -279,13 +279,9 @@ What is H2O?,Water,Salt
         <div id="csv-upload-options">
             Available CSV Files:
             <select id="csv-file-select">
-                <option value="data1.csv">data1.csv</option>
-                <option value="data2.csv">data2.csv</option>
-                <option value="report.csv">report.csv</option>
-                <option value="analysis_results.csv">analysis_results.csv</option>
-                <option value="sample_data.csv">sample_data.csv</option>
+                <option value="">Loading...</option>
             </select>
-            <button id="upload-selected-csv">Upload Selected File</button>
+            <button id="upload-selected-csv" disabled>Upload Selected File</button>
         </div>
     </div>
 
@@ -576,19 +572,19 @@ What is H2O?,Water,Salt
         }
 
         function handleCsvUpload() {
-            const selectedFile = csvFileSelect.value;
-            // Simulate fetching the file content (in a real scenario, this would be an AJAX call)
-            fetch(selectedFile) //   ইউজ করুন সঠিক পথ
+            const selectedFileUrl = csvFileSelect.value;
+            fetch(selectedFileUrl)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error(`Failed to fetch ${selectedFile}`);
+                        throw new Error(`Failed to fetch CSV: ${response.status}`);
                     }
                     return response.text();
                 })
                 .then(csvData => {
-                    // Parse the CSV data (very basic parsing, might need a library for complex CSV)
+                    // Parse the CSV data
                     const lines = csvData.trim().split('\n');
-                    const headers = lines[0].split(',').map(h => h.trim()); // Basic header parsing
+                    const headers = lines[0].split(',').map(h => h.trim());
+
                     if (headers[0] === "Question" && headers[1] === "True" && headers[2] === "False") {
                         flashcards = lines.slice(1).map(line => {
                             const values = line.split(',').map(v => v.trim());
@@ -599,7 +595,7 @@ What is H2O?,Water,Salt
                             };
                         });
 
-                         if (flashcards.length > 0) {
+                        if (flashcards.length > 0) {
                             currentCardIndex = 0;
                             rightCount = 0;
                             totalCount = 0;
@@ -619,14 +615,43 @@ What is H2O?,Water,Salt
                             alert("The uploaded file contains no flashcard data.");
                         }
                     } else {
-                         alert("The uploaded file is not in the correct format.  Please ensure the first row contains the headers 'Question', 'True', and 'False'.");
+                        alert("The uploaded file is not in the correct format. Please ensure the first row contains the headers 'Question', 'True', and 'False'.");
                     }
-
-
                 })
                 .catch(error => {
-                    console.error("Error loading CSV file:", error);
-                    alert(`Error loading CSV file: ${error.message}`);
+                    console.error("Error processing CSV data:", error);
+                    alert(`Error processing CSV data: ${error.message}`);
+                });
+        }
+
+
+
+        function fetchCsvListFromRepo() {
+            const repoUrl = 'https://api.github.com/repos/boobalootoo/flashcards/contents'; // corrected
+            fetch(repoUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch from GitHub API: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const csvFiles = data
+                        .filter(item => item.name.toLowerCase().endsWith('.csv'))
+                        .map(item => item.download_url); // Use download_url
+
+                    if (csvFiles.length === 0) {
+                        csvFileSelect.innerHTML = '<option value="">No CSV files found</option>';
+                        uploadSelectedCsvButton.disabled = true;
+                    } else {
+                        csvFileSelect.innerHTML = csvFiles.map(fileUrl => `<option value="${fileUrl}">${fileUrl.split('/').pop()}</option>`).join('');
+                        uploadSelectedCsvButton.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching CSV list:", error);
+                    csvFileSelect.innerHTML = `<option value="">Error: ${error.message}</option>`;
+                    uploadSelectedCsvButton.disabled = true;
                 });
         }
 
@@ -635,12 +660,14 @@ What is H2O?,Water,Salt
         if (flashcards.length === 0) {
             tableInput.style.display = "table";
             generateDownloadButton.style.display = "block";
-            addRowToTable(); // Ensure at least one row is present when the table is first displayed.
+            addRowToTable();
         } else {
             displayCard();
             updateStats();
             startTimer();
         }
+
+        fetchCsvListFromRepo(); // Call this function to populate the dropdown
     </script>
 </body>
 </html>
