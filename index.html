@@ -151,6 +151,41 @@
             margin: 10px;
             /* width will be defined, or will take up available space */
         }
+
+        #csv-upload-container {
+            margin-top: 20px; /* Add space above the container */
+            text-align: center; /* Center the content */
+        }
+
+        #csv-upload-options {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: inline-block; /* Adjust as needed for layout */
+            background-color: #f8f8f8;
+        }
+
+        #csv-upload-options select {
+            padding: 8px;
+            margin-left: 5px; /* Add space between label and select */
+            border-radius: 3px;
+            border: 1px solid #aaa;
+        }
+
+        #csv-upload-options button {
+            padding: 8px 12px;
+            margin-left: 10px; /* Add space before the button */
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #csv-upload-options button:hover {
+            background-color: #45a049;
+        }
+
     </style>
 </head>
 <body>
@@ -193,7 +228,8 @@
         </table>
         <div id="generate-download">
             <button id="download-table">Download Table</button>
-            <button id="add-row">Add Row</button> </div>
+             <button id="add-row">Add Row</button>
+        </div>
     </div>
 
     <div id="instructions">
@@ -239,6 +275,20 @@ What is H2O?,Water,Salt
         </table>
     </div>
 
+    <div id="csv-upload-container">
+        <div id="csv-upload-options">
+            Available CSV Files:
+            <select id="csv-file-select">
+                <option value="data1.csv">data1.csv</option>
+                <option value="data2.csv">data2.csv</option>
+                <option value="report.csv">report.csv</option>
+                <option value="analysis_results.csv">analysis_results.csv</option>
+                <option value="sample_data.csv">sample_data.csv</option>
+            </select>
+            <button id="upload-selected-csv">Upload Selected File</button>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <script>
         let flashcards = [];
@@ -263,6 +313,8 @@ What is H2O?,Water,Salt
         const downloadTableButton = document.getElementById("download-table");
         const generateDownloadButton = document.getElementById("generate-download");
         const addRowButton = document.getElementById("add-row"); // Get the Add Row button
+        const csvFileSelect = document.getElementById("csv-file-select");
+        const uploadSelectedCsvButton = document.getElementById("upload-selected-csv");
 
 
         uploadTableButton.addEventListener("click", () => {
@@ -272,7 +324,7 @@ What is H2O?,Water,Salt
         createTableButton.addEventListener("click", () => {
             tableInput.style.display = "table";
             generateDownloadButton.style.display = "block";
-            // Clear any existing content in the table body, before adding rows.
+             // Clear any existing content in the table body, before adding rows.
             const tableBody = tableInput.querySelector("tbody");
             tableBody.innerHTML = '';
             addRowToTable(); // Add at least one row when table is created.
@@ -282,6 +334,8 @@ What is H2O?,Water,Salt
         fileUpload.addEventListener("change", handleFile);
         downloadTableButton.addEventListener("click", downloadTable);
         addRowButton.addEventListener("click", addRowToTable); // Add event listener for Add Row button
+        uploadSelectedCsvButton.addEventListener("click", handleCsvUpload);
+
 
 
         function handleFile(event) {
@@ -349,23 +403,23 @@ What is H2O?,Water,Salt
                 }
             }
              if (flashcards.length > 0) {
-                currentCardIndex = 0;
-                rightCount = 0;
-                totalCount = 0;
-                wrongCount = 0;
-                streakCount = 0;
-                wrongCards = [];
-                nextWrongCardIndex = 0;
-                wrongCardCounters = [0, 0, 0];
-                isCorrectAnswerLeft = true;
-                cardHistory = [];
-                displayCard();
-                updateStats();
-                startTimer();
-                tableInput.style.display = "none";
-                generateDownloadButton.style.display = "none";
+                    currentCardIndex = 0;
+                    rightCount = 0;
+                    totalCount = 0;
+                    wrongCount = 0;
+                    streakCount = 0;
+                    wrongCards = [];
+                    nextWrongCardIndex = 0;
+                    wrongCardCounters = [0, 0, 0];
+                    isCorrectAnswerLeft = true;
+                    cardHistory = [];
+                    displayCard();
+                    updateStats();
+                    startTimer();
+                    tableInput.style.display = "none";
+                    generateDownloadButton.style.display = "none";
             } else {
-                 alert("Please enter flashcard data into the table.");
+                    alert("Please enter flashcard data into the table.");
             }
         }
 
@@ -392,7 +446,7 @@ What is H2O?,Water,Salt
 
         function displayCard() {
             let card;
-            if (wrongCards.length > 0 && nextWrongCardIndex < wrongCards.length) {
+             if (wrongCards.length > 0 && nextWrongCardIndex < wrongCards.length) {
                 card = wrongCards[nextWrongCardIndex];
             } else {
                 card = flashcards[currentCardIndex];
@@ -429,15 +483,15 @@ What is H2O?,Water,Salt
                 rightCount++;
                 streakCount++;
                  if (isWrongCard) {
-                    wrongCards.splice(nextWrongCardIndex, 1);
-                    if (wrongCards.length === 0) {
+                     wrongCards.splice(nextWrongCardIndex, 1);
+                     if (wrongCards.length === 0) {
                         nextWrongCardIndex = 0;
-                    }
-                }
+                     }
+                 }
             } else {
                 wrongCount++;
                 streakCount = 0;
-                if (!isWrongCard && wrongCards.indexOf(card) === -1) {
+                 if (!isWrongCard && wrongCards.indexOf(card) === -1) {
                     wrongCards.push(card);
                 }
             }
@@ -448,7 +502,7 @@ What is H2O?,Water,Salt
              if (wrongCards.length > 0 && nextWrongCardIndex < wrongCards.length) {
                  //do nothing
              }else{
-                currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+                 currentCardIndex = (currentCardIndex + 1) % flashcards.length;
              }
 
             for (let i = 0; i < wrongCardCounters.length; i++) {
@@ -519,6 +573,61 @@ What is H2O?,Water,Salt
             questionCell.innerHTML = '<input type="text" />';
             trueCell.innerHTML = '<input type="text" />';
             falseCell.innerHTML = '<input type="text" />';
+        }
+
+        function handleCsvUpload() {
+            const selectedFile = csvFileSelect.value;
+            // Simulate fetching the file content (in a real scenario, this would be an AJAX call)
+            fetch(selectedFile) //   ইউজ করুন সঠিক পথ
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch ${selectedFile}`);
+                    }
+                    return response.text();
+                })
+                .then(csvData => {
+                    // Parse the CSV data (very basic parsing, might need a library for complex CSV)
+                    const lines = csvData.trim().split('\n');
+                    const headers = lines[0].split(',').map(h => h.trim()); // Basic header parsing
+                    if (headers[0] === "Question" && headers[1] === "True" && headers[2] === "False") {
+                        flashcards = lines.slice(1).map(line => {
+                            const values = line.split(',').map(v => v.trim());
+                            return {
+                                question: values[0],
+                                answer1: values[1],
+                                answer2: values[2]
+                            };
+                        });
+
+                         if (flashcards.length > 0) {
+                            currentCardIndex = 0;
+                            rightCount = 0;
+                            totalCount = 0;
+                            wrongCount = 0;
+                            streakCount = 0;
+                            wrongCards = [];
+                            nextWrongCardIndex = 0;
+                            wrongCardCounters = [0, 0, 0];
+                            isCorrectAnswerLeft = true;
+                            cardHistory = [];
+                            displayCard();
+                            updateStats();
+                            startTimer();
+                            tableInput.style.display = "none";
+                            generateDownloadButton.style.display = "none";
+                        } else {
+                            alert("The uploaded file contains no flashcard data.");
+                        }
+                    } else {
+                         alert("The uploaded file is not in the correct format.  Please ensure the first row contains the headers 'Question', 'True', and 'False'.");
+                    }
+
+
+                })
+                .catch(error => {
+                    console.error("Error loading CSV file:", error);
+                    alert(`Error loading CSV file: ${error.message}`);
+                });
         }
 
 
