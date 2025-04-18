@@ -1,4 +1,4 @@
-Question,TRUE,FALSE
+Question,True,False
 Describe the fetch-execute cycle,"The CPU fetches an instruction from memory, decodes it to understand the action required, and then executes it.","The CPU fetches an instruction, executes it, and then decodes it."
 List common CPU components and their function,"ALU (calculations/logic), CU (controls the CPU), Registers (temporary storage), Cache (fast memory), Buses (data transfer).","ALU (controls CPU), CU (performs calculations), Registers (permanent storage), Cache (slow memory), Buses (store data)."
 What is the function of an ALU?,It performs arithmetic and logic operations.,It stores arithmetic and logic operations.
